@@ -17,4 +17,4 @@ RUN poetry run playwright install-deps
 COPY ./src /app/src
 COPY ./start.py /app/start.py
 COPY ./main.py /app/main.py
-ENTRYPOINT ["poetry", "run", "python", "-u","main.py"]
+ENTRYPOINT ["poetry", "run", "python", "-u","start.py"]

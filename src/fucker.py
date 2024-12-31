@@ -161,20 +161,22 @@ def match_template(base_img_np: np.ndarray, target_img_np: np.ndarray):
     return rst
 
 
-async def get_ticket():
+async def get_ticket()->str:
     async with async_playwright() as p:
+        load_timeout = 20000
+        load_timeout_short = 10000
+        wait_timeout = 4000
         browser = await p.chromium.launch(
             headless=True,
+            timeout=load_timeout,
         )  # 设置headless=False来显示浏览器
         page = await browser.new_page()
-        load_timeout = 10000
-        load_timeout_short = 5000
-        wait_timeout = 2000
+        
         load_js = """
                 const captcha = new window.TencentCaptcha("2039519451", (response) => {
                     if (response.ret === 0) {
-                        console.log('ticket:', response.ticket);
-                        console.log('randstr:', response.randstr);
+                        // console.log('ticket:', response.ticket);
+                        // console.log('randstr:', response.randstr);
                         ticket=response.ticket;
                     }
                 });
@@ -270,9 +272,9 @@ async def get_ticket():
 
             # # 点击验证按钮
             verify_btn = ae(
-                await iframe.wait_for_selector("div.tc-action.verify-btn.show")
+                await iframe.wait_for_selector("div.tc-action.verify-btn.show", timeout=wait_timeout)
             )
-            await verify_btn.click()
+            await verify_btn.click(timeout=wait_timeout)
 
             await asyncio.sleep(3)
 
