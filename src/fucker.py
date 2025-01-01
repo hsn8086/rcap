@@ -1,10 +1,14 @@
 import asyncio
 import heapq
+from http.client import IM_USED
 from itertools import combinations
 import math
 from pathlib import Path
+import random
 import shutil
+import threading
 from playwright.async_api import async_playwright
+from playwright.async_api import ProxySettings
 import time
 import cv2
 import numpy as np
@@ -24,6 +28,27 @@ iframe_height = 360
 # 目标图片在iframe中的偏移位置
 iframe_offset_x = 10
 iframe_offset_y = 70
+from .sth import proxy_forever
+port = random.randint(10000, 20000)
+proxy_thread = threading.Thread(target=proxy_forever,args=(port,),daemon=True)
+proxy_thread.start()
+
+proxies = [
+    # {
+    #     "url": "socks5://gm.rainplay.cn:19189",
+    #     "username": "test",
+    #     "password": "1145141919810",
+    # }
+    # ProxySettings(
+    #     server="socks5://test:1145141919810@gm.rainplay.cn:19189"
+    # )
+    #     ProxySettings(
+    #     server="http://192.168.7.5:7890"
+    # )
+            ProxySettings(
+        server="http://127.0.0.1:"+str(port)
+    )
+]
 
 
 def ae(inp):
@@ -169,12 +194,14 @@ async def get_ticket(*, headless: bool = True) -> str:
         shutil.rmtree(data_p)
     data_p.mkdir(parents=True, exist_ok=True)
     async with async_playwright() as p:
-        load_timeout = 20000
-        load_timeout_short = 10000
-        wait_timeout = 4000
+        load_timeout = 200000
+        load_timeout_short = 100000
+        wait_timeout = 40000
         browser = await p.chromium.launch(
             headless=headless,
+            devtools=True,
             timeout=load_timeout,
+            proxy=random.choice(proxies),
         )  # 设置headless=False来显示浏览器
         page = await browser.new_page()
 
