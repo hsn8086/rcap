@@ -1,0 +1,11 @@
+[project]
+version = "0.2.1"
+name = "rcap"
+
+[[system.proxies]]
+url = ""
+username = ""
+password = ""
+
+
+

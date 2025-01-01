@@ -11,6 +11,11 @@ files = [
     {file = "annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
+
 [[package]]
 name = "anyio"
 version = "4.7.0"
@@ -32,6 +37,11 @@ doc = ["Sphinx (>=7.4,<8.0)", "packaging", "sphinx-autodoc-typehints (>=1.2.0)",
 test = ["anyio[trio]", "coverage[toml] (>=7)", "exceptiongroup (>=1.2.0)", "hypothesis (>=4.0)", "psutil (>=5.9)", "pytest (>=7.0)", "pytest-mock (>=3.6.1)", "trustme", "truststore (>=0.9.1)", "uvloop (>=0.21)"]
 trio = ["trio (>=0.26.1)"]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
+
 [[package]]
 name = "certifi"
 version = "2024.12.14"
@@ -42,6 +52,11 @@ files = [
     {file = "certifi-2024.12.14-py3-none-any.whl", hash = "sha256:1275f7a45be9464efc1173084eaa30f866fe2e47d389406136d332ed4967ec56"},
     {file = "certifi-2024.12.14.tar.gz", hash = "sha256:b650d30f370c2b724812bee08008be0c4163b163ddaec3f2546c1caf65f191db"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
 
 [[package]]
 name = "charset-normalizer"
@@ -144,6 +159,11 @@ files = [
     {file = "charset_normalizer-3.4.1.tar.gz", hash = "sha256:44251f18cd68a75b56585dd00dae26183e102cd5e0f9f1466e6df5da2ed64ea3"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
+
 [[package]]
 name = "click"
 version = "8.1.8"
@@ -158,6 +178,11 @@ files = [
 [package.dependencies]
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
+
 [[package]]
 name = "colorama"
 version = "0.4.6"
@@ -168,6 +193,11 @@ files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
 
 [[package]]
 name = "fastapi"
@@ -188,6 +218,11 @@ typing-extensions = ">=4.8.0"
 [package.extras]
 all = ["email-validator (>=2.0.0)", "fastapi-cli[standard] (>=0.0.5)", "httpx (>=0.23.0)", "itsdangerous (>=1.1.0)", "jinja2 (>=2.11.2)", "orjson (>=3.2.1)", "pydantic-extra-types (>=2.0.0)", "pydantic-settings (>=2.0.0)", "python-multipart (>=0.0.7)", "pyyaml (>=5.3.1)", "ujson (>=4.0.1,!=4.0.2,!=4.1.0,!=4.2.0,!=4.3.0,!=5.0.0,!=5.1.0)", "uvicorn[standard] (>=0.12.0)"]
 standard = ["email-validator (>=2.0.0)", "fastapi-cli[standard] (>=0.0.5)", "httpx (>=0.23.0)", "jinja2 (>=2.11.2)", "python-multipart (>=0.0.7)", "uvicorn[standard] (>=0.12.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
 
 [[package]]
 name = "greenlet"
@@ -275,6 +310,11 @@ files = [
 docs = ["Sphinx", "furo"]
 test = ["objgraph", "psutil"]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
+
 [[package]]
 name = "h11"
 version = "0.14.0"
@@ -285,6 +325,11 @@ files = [
     {file = "h11-0.14.0-py3-none-any.whl", hash = "sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761"},
     {file = "h11-0.14.0.tar.gz", hash = "sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
 
 [[package]]
 name = "httpcore"
@@ -306,6 +351,11 @@ asyncio = ["anyio (>=4.0,<5.0)"]
 http2 = ["h2 (>=3,<5)"]
 socks = ["socksio (==1.*)"]
 trio = ["trio (>=0.22.0,<1.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
 
 [[package]]
 name = "httpx"
@@ -331,6 +381,11 @@ http2 = ["h2 (>=3,<5)"]
 socks = ["socksio (==1.*)"]
 zstd = ["zstandard (>=0.18.0)"]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
+
 [[package]]
 name = "idna"
 version = "3.10"
@@ -344,6 +399,27 @@ files = [
 
 [package.extras]
 all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2)"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
+
+[[package]]
+name = "invoke"
+version = "2.2.0"
+description = "Pythonic task execution"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "invoke-2.2.0-py3-none-any.whl", hash = "sha256:6ea924cc53d4f78e3d98bc436b08069a03077e6f85ad1ddaa8a116d7dad15820"},
+    {file = "invoke-2.2.0.tar.gz", hash = "sha256:ee6cbb101af1a859c7fe84f2a264c059020b0cb7fe3535f9424300ab568f6bd5"},
+]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
 
 [[package]]
 name = "numpy"
@@ -409,6 +485,11 @@ files = [
     {file = "numpy-2.2.1.tar.gz", hash = "sha256:45681fd7128c8ad1c379f0ca0776a8b0c6583d2f69889ddac01559dfe4390918"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
+
 [[package]]
 name = "opencv-python"
 version = "4.10.0.84"
@@ -427,6 +508,11 @@ files = [
 
 [package.dependencies]
 numpy = {version = ">=1.26.0", markers = "python_version >= \"3.12\""}
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
 
 [[package]]
 name = "playwright"
@@ -448,6 +534,11 @@ files = [
 greenlet = "3.1.1"
 pyee = "12.0.0"
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
+
 [[package]]
 name = "pydantic"
 version = "2.10.4"
@@ -467,6 +558,11 @@ typing-extensions = ">=4.12.2"
 [package.extras]
 email = ["email-validator (>=2.0.0)"]
 timezone = ["tzdata"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
 
 [[package]]
 name = "pydantic-core"
@@ -580,6 +676,11 @@ files = [
 [package.dependencies]
 typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
+
 [[package]]
 name = "pyee"
 version = "12.0.0"
@@ -596,6 +697,11 @@ typing-extensions = "*"
 
 [package.extras]
 dev = ["black", "build", "flake8", "flake8-black", "isort", "jupyter-console", "mkdocs", "mkdocs-include-markdown-plugin", "mkdocstrings[python]", "pytest", "pytest-asyncio", "pytest-trio", "sphinx", "toml", "tox", "trio", "trio", "trio-typing", "twine", "twisted", "validate-pyproject[all]"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
 
 [[package]]
 name = "requests"
@@ -618,6 +724,11 @@ urllib3 = ">=1.21.1,<3"
 socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
+
 [[package]]
 name = "sniffio"
 version = "1.3.1"
@@ -628,6 +739,11 @@ files = [
     {file = "sniffio-1.3.1-py3-none-any.whl", hash = "sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2"},
     {file = "sniffio-1.3.1.tar.gz", hash = "sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
 
 [[package]]
 name = "starlette"
@@ -646,6 +762,11 @@ anyio = ">=3.4.0,<5"
 [package.extras]
 full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7)", "pyyaml"]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
+
 [[package]]
 name = "typing-extensions"
 version = "4.12.2"
@@ -656,6 +777,11 @@ files = [
     {file = "typing_extensions-4.12.2-py3-none-any.whl", hash = "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d"},
     {file = "typing_extensions-4.12.2.tar.gz", hash = "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
 
 [[package]]
 name = "urllib3"
@@ -673,6 +799,11 @@ brotli = ["brotli (>=1.0.9)", "brotlicffi (>=0.8.0)"]
 h2 = ["h2 (>=4,<5)"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
 
 [[package]]
 name = "uvicorn"
@@ -692,7 +823,12 @@ h11 = ">=0.8"
 [package.extras]
 standard = ["colorama (>=0.4)", "httptools (>=0.6.3)", "python-dotenv (>=0.13)", "pyyaml (>=5.1)", "uvloop (>=0.14.0,!=0.15.0,!=0.15.1)", "watchfiles (>=0.13)", "websockets (>=10.4)"]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "mirrors"
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "512f0af4a8d8f07feecbab606ec7b1f4e7d807ce59c2529eb13249a077a92c9e"
+content-hash = "a4f422eb61487fc5a43c48103a9e406e8ccfbf217aada8c3423652bb6511fe0a"

@@ -2,6 +2,8 @@ import asyncio
 import heapq
 from itertools import combinations
 import math
+from pathlib import Path
+import shutil
 from playwright.async_api import async_playwright
 import time
 import cv2
@@ -146,7 +148,7 @@ def match_template(base_img_np: np.ndarray, target_img_np: np.ndarray):
             # result_img[y : y + icon.shape[0], x : x + icon.shape[1]] = cv2.cvtColor(
             #     rotated_icon, cv2.COLOR_GRAY2BGR
             # )
-            
+
         else:
             raise Exception("Failed to locate icon: score too low")
     for a, b in combinations(rst, 2):
@@ -161,18 +163,23 @@ def match_template(base_img_np: np.ndarray, target_img_np: np.ndarray):
     return rst
 
 
-async def get_ticket()->str:
+async def get_ticket(*, headless: bool = True) -> str:
+    data_p = Path("data/pic")
+    if data_p.exists():
+        shutil.rmtree(data_p)
+    data_p.mkdir(parents=True, exist_ok=True)
     async with async_playwright() as p:
         load_timeout = 20000
         load_timeout_short = 10000
         wait_timeout = 4000
         browser = await p.chromium.launch(
-            headless=True,
+            headless=headless,
             timeout=load_timeout,
         )  # 设置headless=False来显示浏览器
         page = await browser.new_page()
-        
+
         load_js = """
+                ticket = '';
                 const captcha = new window.TencentCaptcha("2039519451", (response) => {
                     if (response.ret === 0) {
                         // console.log('ticket:', response.ticket);
@@ -189,38 +196,53 @@ async def get_ticket()->str:
             # 执行验证码初始化JavaScript代码
             await page.evaluate(load_js)
             while True:
-                # 等待iframe加载
-                iframe_element = ae(
-                    await page.wait_for_selector("iframe", timeout=load_timeout_short)
-                )
+                for _ in range(30):
+                    try:
+                        # 等待iframe加载
+                        iframe_element = ae(
+                            await page.wait_for_selector(
+                                "iframe", timeout=load_timeout_short
+                            )
+                        )
 
-                iframe = ae(await iframe_element.content_frame())
+                        iframe = ae(await iframe_element.content_frame())
 
-                # 获取基准图片的src
-                base_img_element = ae(
-                    await iframe.wait_for_selector(
-                        "div.tc-instruction-icon img", timeout=wait_timeout
-                    )
-                )
-                base_img_src = ae(await base_img_element.get_attribute("src"))
+                        # 获取基准图片的src
+                        base_img_element = ae(
+                            await iframe.wait_for_selector(
+                                "div.tc-instruction-icon img", timeout=wait_timeout
+                            )
+                        )
+                        base_img_src = ae(await base_img_element.get_attribute("src"))
 
-                # 获取目标图片的background-image
-                target_img_element = ae(
-                    await iframe.wait_for_selector(
-                        "div.tc-bg-img.unselectable", timeout=wait_timeout
-                    )
-                )
-                target_img_style = ae(await target_img_element.get_attribute("style"))
-                target_img_url = ae(
-                    re.search(r'url\("(.+?)"\)', target_img_style)
-                ).group(1)
+                        # 获取目标图片的background-image
+                        target_img_element = ae(
+                            await iframe.wait_for_selector(
+                                "div.tc-bg-img.unselectable", timeout=wait_timeout
+                            )
+                        )
 
+                        target_img_style = ae(
+                            await target_img_element.get_attribute("style")
+                        )
+                        target_img_url = ae(
+                            re.search(r'url\("(.+?)"\)', target_img_style)
+                        ).group(1)
+                        break
+                    except Exception as e:
+                        print("Failed to get captcha info. Retrying...")
+                        await asyncio.sleep(0.5)
+                        continue
+                else:
+                    raise Exception("Failed to get captcha info.")
+                await page.screenshot(path=data_p / f"{time.time_ns()}.png")
                 # 下载图片数据
                 base_img_np = await download_image(base_img_src)
                 target_img_np = await download_image(target_img_url)
                 # cv2.imshow("Detection Results", target_img_np)
                 # cv2.waitKey(30000)  # 显示1秒
                 # cv2.destroyAllWindows()
+
                 try:
                     rst = match_template(base_img_np, target_img_np)
                     if len(rst) == 3:
@@ -235,7 +257,47 @@ async def get_ticket()->str:
                                 timeout=wait_timeout,
                             )
                         ).click()
-                        await asyncio.sleep(1)
+                        await page.screenshot(path=data_p / f"{time.time_ns()}.png")
+                        await asyncio.sleep(3)
+                        for _ in range(30):
+                            # 等待刷新
+                            try:
+                                iframe_element = ae(
+                                    await page.wait_for_selector(
+                                        "iframe", timeout=load_timeout_short
+                                    )
+                                )
+
+                                iframe = ae(await iframe_element.content_frame())
+
+                                target_img_element = ae(
+                                    await iframe.wait_for_selector(
+                                        "div.tc-bg-img.unselectable",
+                                        timeout=wait_timeout,
+                                    )
+                                )
+                                target_img_url = ae(
+                                    re.search(
+                                        r'url\("(.+?)"\)',
+                                        ae(
+                                            await target_img_element.get_attribute(
+                                                "style"
+                                            )
+                                        ),
+                                    )
+                                ).group(1)
+                                if target_img_style == ae(
+                                    await target_img_element.get_attribute("style")
+                                ):
+                                    await asyncio.sleep(0.5)
+                                    continue
+                                else:
+                                    break
+                            except Exception as e:
+                                await asyncio.sleep(0.5)
+                                continue
+                        else:
+                            raise Exception("Failed to refresh")
                     except Exception as e:
                         await page.reload()
                         await page.evaluate(load_js)
@@ -255,6 +317,7 @@ async def get_ticket()->str:
                         button="left",
                         force=True,
                     )
+                    await page.screenshot(path=data_p / f"{time.time_ns()}_click.png")
                     # time.sleep(1)
                     if i < 2:
                         await asyncio.sleep(
@@ -272,16 +335,22 @@ async def get_ticket()->str:
 
             # # 点击验证按钮
             verify_btn = ae(
-                await iframe.wait_for_selector("div.tc-action.verify-btn.show", timeout=wait_timeout)
+                await iframe.wait_for_selector(
+                    "div.tc-action.verify-btn.show", timeout=wait_timeout
+                )
             )
             await verify_btn.click(timeout=wait_timeout)
 
-            await asyncio.sleep(3)
-
-            ticket = await page.evaluate("ticket")
-            if ticket:
-                return ticket
+            ticket = None
+            for _ in range(30):
+                await page.screenshot(path=data_p / f"{time.time_ns()}_error.png")
+                ticket = await page.evaluate("ticket")
+                if ticket:
+                    print("Got ticket! length:", len(ticket))
+                    return ticket
+                await asyncio.sleep(0.5)
             else:
+                await page.screenshot(path=data_p / f"{time.time_ns()}_error.png")
                 raise Exception("Failed to get ticket")
 
         finally:
