@@ -1,29 +1,14 @@
-from calendar import c
-from itertools import count
-import socketserver
-import http.server
 import socket
+from venv import logger
 import socks
 
 import threading
-import time
-from urllib.parse import urlparse
 
-
-# 全局变量来跟踪数据传输量
-total_upload = 0
-total_download = 0
-current_upload = 0
-current_download = 0
-lock = threading.Lock()
 
 # 设置SOCKS5代理
 socks.set_default_proxy(
     socks.SOCKS5, "gm.rainplay.cn", 19189, username="test", password="1145141919810"
 )
-# socks.set_default_proxy(
-#     socks.SOCKS5, "218.204.174.130", 55555, username="yixia", password="yixiasayu"
-# )
 socket.socket = socks.socksocket
 
 
@@ -37,13 +22,13 @@ def handle_client(client_socket):
     request_lines = request_data.decode().split("\r\n")
     # 获取请求方法、URL和协议版本
     method, url, protocol = request_lines[0].split()
-    print("请求方法：%s，URL：%s，协议版本：%s" % (method, url, protocol))
+    logger.debug("Method: %s, URL: %s, Ver: %s" % (method, url, protocol))
     server_socket = None
     if method == "CONNECT":
         # 解析URL
         hostname, port = url.split(":")
         port = int(port)
-        print("主机名：%s , 端口：%s" % (hostname, port))
+        logger.debug("Host: %s , Port: %s" % (hostname, port))
         # 创建与目标服务器的连接
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -106,12 +91,12 @@ def proxy_forever(port):
     server_socket.bind(server_address)
     # 监听连接
     server_socket.listen(5)
-    print("代理服务器已启动，监听地址：%s:%d" % server_address)
+    logger.info("Proxy listening on: %s:%d" % server_address)
     try:
         while True:
             # 等待客户端连接
             client_socket, client_address = server_socket.accept()
-            print("客户端已连接，地址：%s:%d" % client_address)
+            logger.debug("Client connect：%s:%d" % client_address)
             # 创建线程处理客户端请求
             client_thread = threading.Thread(
                 target=handle_client, args=(client_socket,), daemon=True

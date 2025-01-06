@@ -9,11 +9,14 @@ import shutil
 import threading
 from playwright.async_api import async_playwright
 from playwright.async_api import ProxySettings
+from loguru import logger
+from .sth import proxy_forever
 import time
 import cv2
 import numpy as np
 import re
 import httpx
+
 
 # 目标图片的显示尺寸与实际尺寸的比例
 actual_target_width = 672
@@ -28,9 +31,10 @@ iframe_height = 360
 # 目标图片在iframe中的偏移位置
 iframe_offset_x = 10
 iframe_offset_y = 70
-from .sth import proxy_forever
+
+
 port = random.randint(10000, 20000)
-proxy_thread = threading.Thread(target=proxy_forever,args=(port,),daemon=True)
+proxy_thread = threading.Thread(target=proxy_forever, args=(port,), daemon=True)
 proxy_thread.start()
 
 proxies = [
@@ -45,9 +49,10 @@ proxies = [
     #     ProxySettings(
     #     server="http://192.168.7.5:7890"
     # )
-            ProxySettings(
-        server="http://127.0.0.1:"+str(port)
-    )
+    ProxySettings(server="http://127.0.0.1:" + str(port))
+    # ProxySettings(
+    #     server="http://127.0.0.1:12345", username="test", password="1145141919810"
+    # )
 ]
 
 
@@ -199,7 +204,6 @@ async def get_ticket(*, headless: bool = True) -> str:
         wait_timeout = 40000
         browser = await p.chromium.launch(
             headless=headless,
-            devtools=True,
             timeout=load_timeout,
             proxy=random.choice(proxies),
         )  # 设置headless=False来显示浏览器
@@ -257,7 +261,8 @@ async def get_ticket(*, headless: bool = True) -> str:
                         ).group(1)
                         break
                     except Exception as e:
-                        print("Failed to get captcha info. Retrying...")
+                        logger.debug(e)
+                        logger.info("Failed to get captcha info. Retrying...")
                         await asyncio.sleep(0.5)
                         continue
                 else:
@@ -276,7 +281,7 @@ async def get_ticket(*, headless: bool = True) -> str:
                         break
 
                 except Exception as e:
-                    print(e)
+                    logger.debug(e)
                     try:
                         await ae(
                             await iframe.wait_for_selector(
@@ -326,6 +331,7 @@ async def get_ticket(*, headless: bool = True) -> str:
                         else:
                             raise Exception("Failed to refresh")
                     except Exception as e:
+                        logger.debug(e)
                         await page.reload()
                         await page.evaluate(load_js)
 
@@ -373,7 +379,7 @@ async def get_ticket(*, headless: bool = True) -> str:
                 await page.screenshot(path=data_p / f"{time.time_ns()}_error.png")
                 ticket = await page.evaluate("ticket")
                 if ticket:
-                    print("Got ticket! length:", len(ticket))
+                    logger.info(f"Got ticket! length: {len(ticket)}")
                     return ticket
                 await asyncio.sleep(0.5)
             else:

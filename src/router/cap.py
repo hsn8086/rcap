@@ -1,15 +1,9 @@
 import asyncio
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
 
-from ..tasker import tasker
+from ..tasker import tasker, Status, Ticket
 
 router = APIRouter()
-
-
-class Status(BaseModel):
-    processing: int
-    tickets: int
 
 
 @router.get("/submit")
@@ -19,15 +13,14 @@ async def submit(num: int):
     return
 
 
-@router.get("/status")
+@router.get("/status", response_model=Status)
 async def status():
-    num_of_process, num_of_tickets = tasker.status()
-    return Status(processing=num_of_process, tickets=num_of_tickets)
+    return tasker.status()
 
 
-@router.get("/get_ticket")
+@router.get("/get_ticket", response_model=Ticket)
 async def get_ticket():
     try:
         return next(tasker.get_ticket())
-    except (StopIteration,RuntimeError):
+    except (StopIteration, RuntimeError):
         raise HTTPException(status_code=404, detail="No ticket available")
