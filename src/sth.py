@@ -1,18 +1,24 @@
 import socket
-from venv import logger
+from loguru import logger
 import socks
 
 import threading
 
 
-# 设置SOCKS5代理
-socks.set_default_proxy(
-    socks.SOCKS5, "gm.rainplay.cn", 19189, username="test", password="1145141919810"
-)
-socket.socket = socks.socksocket
+# # 设置SOCKS5代理
+# socks.set_default_proxy(
+#     socks.SOCKS5, "gm.rainplay.cn", 19189, username="test", password="1145141919810"
+# )
+# socket.socket = socks.socksocket
 
 
-def handle_client(client_socket):
+def handle_client(
+    client_socket: socket.socket,
+    socks5_host: str,
+    socks5_port: int,
+    username: str,
+    password: str,
+):
     """
     处理客户端请求
     """
@@ -30,8 +36,10 @@ def handle_client(client_socket):
         port = int(port)
         logger.debug("Host: %s , Port: %s" % (hostname, port))
         # 创建与目标服务器的连接
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+        server_socket = socks.socksocket()
+        server_socket.set_proxy(
+            socks.SOCKS5, socks5_host, socks5_port, username=username, password=password
+        )
         server_socket.connect((hostname, port))
         # 向客户端发送连接已建立的响应
         client_socket.sendall(b"HTTP/1.1 200 Connection Established\r\n\r\n")
@@ -82,7 +90,9 @@ def transfer_data(client_socket: socket.socket, server_socket: socket.socket):
     server_to_client_thread.join()
 
 
-def proxy_forever(port):
+def proxy_forever(
+    port, socks5_host: str, socks5_port: int, username: str, password: str
+):
     # 创建代理服务���套接字
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # 设置地址和端口
@@ -99,7 +109,9 @@ def proxy_forever(port):
             logger.debug("Client connect：%s:%d" % client_address)
             # 创建线程处理客户端请求
             client_thread = threading.Thread(
-                target=handle_client, args=(client_socket,), daemon=True
+                target=handle_client,
+                args=(client_socket, socks5_host, socks5_port, username, password),
+                daemon=True,
             )
             client_thread.start()
 

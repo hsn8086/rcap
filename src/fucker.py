@@ -1,4 +1,5 @@
 import asyncio
+from dataclasses import dataclass
 import heapq
 from http.client import IM_USED
 from itertools import combinations
@@ -33,9 +34,18 @@ iframe_offset_x = 10
 iframe_offset_y = 70
 
 
-port = random.randint(10000, 20000)
-proxy_thread = threading.Thread(target=proxy_forever, args=(port,), daemon=True)
-proxy_thread.start()
+class Socks2Http:
+    def __init__(self, host: str, port: int, username: str, password: str):
+        port_h = random.randint(10000, 20000)
+        proxy_thread = threading.Thread(
+            target=proxy_forever,
+            args=(port_h, host, port, username, password),
+            daemon=True,
+        )
+        proxy_thread.start()
+        self.server = f"http://127.0.0.1:{port_h}"
+
+    
 
 proxies = [
     # {
@@ -49,10 +59,11 @@ proxies = [
     #     ProxySettings(
     #     server="http://192.168.7.5:7890"
     # )
-    ProxySettings(server="http://127.0.0.1:" + str(port))
+    # ProxySettings(server="http://127.0.0.1:" + str(port))
     # ProxySettings(
     #     server="http://127.0.0.1:12345", username="test", password="1145141919810"
     # )
+    Socks2Http("gm.rainplay.cn", 19189,"test","1145141919810")
 ]
 
 
@@ -202,10 +213,11 @@ async def get_ticket(*, headless: bool = True) -> str:
         load_timeout = 200000
         load_timeout_short = 100000
         wait_timeout = 40000
+        proxy=random.choice(proxies)
         browser = await p.chromium.launch(
             headless=headless,
             timeout=load_timeout,
-            proxy=random.choice(proxies),
+            proxy=ProxySettings(server=proxy.server),
         )  # 设置headless=False来显示浏览器
         page = await browser.new_page()
 
