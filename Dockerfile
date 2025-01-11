@@ -7,6 +7,7 @@ RUN pip3 install poetry
 
 WORKDIR /app
 
+
 COPY ./pyproject.toml /app/pyproject.toml
 
 RUN poetry install --no-dev --no-root 

@@ -6,6 +6,7 @@ from .router import routers
 
 p = Path("data/logs")
 p.mkdir(parents=True, exist_ok=True)
+
 logger.add(p / "info.log", rotation="1 day", retention="7 days", level="INFO")
 logger.add(p / "debug.log", rotation="1 day", retention="7 days", level="DEBUG")
 

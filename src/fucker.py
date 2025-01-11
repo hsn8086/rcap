@@ -3,15 +3,18 @@ from dataclasses import dataclass
 import heapq
 from http.client import IM_USED
 from itertools import combinations
+import json
 import math
 from pathlib import Path
 import random
 import shutil
+import socket
 import threading
+from weakref import proxy
 from playwright.async_api import async_playwright
 from playwright.async_api import ProxySettings
 from loguru import logger
-from .sth import proxy_forever
+from .sth import handle_client, proxy_forever
 import time
 import cv2
 import numpy as np
@@ -37,15 +40,48 @@ iframe_offset_y = 70
 class Socks2Http:
     def __init__(self, host: str, port: int, username: str, password: str):
         port_h = random.randint(10000, 20000)
-        proxy_thread = threading.Thread(
-            target=proxy_forever,
+        self.proxy_thread = threading.Thread(
+            target=self.process,
             args=(port_h, host, port, username, password),
             daemon=True,
         )
-        proxy_thread.start()
+        self.proxy_thread.start()
         self.server = f"http://127.0.0.1:{port_h}"
 
-    
+    def process(
+        self,
+        port: int,
+        socks5_host: str,
+        socks5_port: int,
+        username: str,
+        password: str,
+    ):
+        # 创建代理服务���套接字
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # 设置地址和端口
+        server_address = ("127.0.0.1", port)
+        # 绑定地址和端口
+        server_socket.bind(server_address)
+        # 监听连接
+        server_socket.listen(5)
+        logger.info("Proxy listening on: %s:%d" % server_address)
+        try:
+            while True:
+                # 等待客户端连接
+                client_socket, client_address = server_socket.accept()
+                logger.debug("Client connect：%s:%d" % client_address)
+                # 创建线程处理客户端请求
+                client_thread = threading.Thread(
+                    target=handle_client,
+                    args=(client_socket, socks5_host, socks5_port, username, password),
+                    daemon=True,
+                )
+                client_thread.start()
+
+        finally:
+            # 关闭服务器套接字
+            server_socket.close()
+
 
 proxies = [
     # {
@@ -63,7 +99,14 @@ proxies = [
     # ProxySettings(
     #     server="http://127.0.0.1:12345", username="test", password="1145141919810"
     # )
-    Socks2Http("gm.rainplay.cn", 19189,"test","1145141919810")
+    {
+        "type": "http",
+        "server": Socks2Http("gm.rainplay.cn", 19189, "test", "1145141919810").server,
+        "ban_time": 0,
+        "ban_count": 10,
+        "base_ban_count": 10,
+    },
+    {"type": "local", "ban_time": 0, "ban_count": 10, "base_ban_count": 10},
 ]
 
 
@@ -213,12 +256,27 @@ async def get_ticket(*, headless: bool = True) -> str:
         load_timeout = 200000
         load_timeout_short = 100000
         wait_timeout = 40000
-        proxy=random.choice(proxies)
-        browser = await p.chromium.launch(
-            headless=headless,
-            timeout=load_timeout,
-            proxy=ProxySettings(server=proxy.server),
-        )  # 设置headless=False来显示浏览器
+        # with open("data/proxy.json") as f:
+        #     proxy=random.choice(json.load(f))
+        count = 0
+        while (proxy := random.choice(proxies))["ban_time"] > time.time():
+            count = (count + 1) % 100
+            if count == 0:
+                print("All proxies are banned. Waiting for 10 minutes...")
+                for i in range(600):
+                    await asyncio.sleep(1)
+            await asyncio.sleep(0.1)
+        if proxy["type"] == "local":
+            browser = await p.chromium.launch(
+                headless=headless,
+                timeout=load_timeout,
+            )
+        else:
+            browser = await p.chromium.launch(
+                headless=headless,
+                timeout=load_timeout,
+                proxy=ProxySettings(server=proxy["server"]),
+            )  # 设置headless=False来显示浏览器
         page = await browser.new_page()
 
         load_js = """
@@ -396,6 +454,10 @@ async def get_ticket(*, headless: bool = True) -> str:
                 await asyncio.sleep(0.5)
             else:
                 await page.screenshot(path=data_p / f"{time.time_ns()}_error.png")
+                proxy["ban_count"] -= 1
+                if proxy["ban_count"] <= 0:
+                    proxy["ban_time"] = time.time() + 86400
+                    proxy["ban_count"] = proxy["base_ban_count"]
                 raise Exception("Failed to get ticket")
 
         finally:
